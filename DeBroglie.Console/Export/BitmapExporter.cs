@@ -1,4 +1,5 @@
-﻿using DeBroglie.Console.Config;
+﻿using System.IO;
+using DeBroglie.Console.Config;
 using DeBroglie.Models;
 using DeBroglie.Topo;
 using SixLabors.ImageSharp;
@@ -42,7 +43,19 @@ namespace DeBroglie.Console.Export
                 {
                     var topoArray = propagator.ToValueArray(Rgba32.Gray, Rgba32.Magenta);
                     var bitmap = BitmapUtils.ToBitmap(topoArray.ToArray2d());
-                    bitmap.Save(filename);
+
+                    var index       = 0;
+                    var noExtension = Path.GetFileNameWithoutExtension(filename);
+                    var justExtension = Path.GetExtension(filename);
+                    var pathNoFile  = Path.GetDirectoryName(filename);
+
+                    var seqFilename = "";
+                    do {
+                        seqFilename = pathNoFile + Path.DirectorySeparatorChar + noExtension + (index == 0 ? "" : index.ToString()) + justExtension;
+                        index++;
+                    } while (File.Exists(seqFilename));
+                    
+                    bitmap.Save(seqFilename);
                 }
                 else if (exportOptions is BitmapSetExportOptions bseo)
                 {
